@@ -2,161 +2,58 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Futur simple – Verbes du 1er groupe</title>
+  <title>Imparfait - Verbes en -er</title>
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 40px;
-    }
-    #question {
-      font-size: 24px;
-      margin: 20px;
-    }
-    #reponse {
-      font-size: 22px;
-      color: green;
-      margin: 20px;
-      display: none;
-    }
-    button {
-      padding: 10px 20px;
-      font-size: 18px;
-      margin: 10px;
-    }
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    #question, #reponse { font-size: 24px; margin: 20px; }
+    button { font-size: 18px; margin: 10px; padding: 10px 20px; }
   </style>
 </head>
 <body>
-  <h1>Conjugue au futur simple</h1>
+  <h1>Imparfait – Verbes du 1er groupe</h1>
   <div id="question">Clique sur "Nouvelle question" pour commencer.</div>
-  <div id="reponse"></div>
-
+  <div id="reponse" style="color: green;"></div>
   <button onclick="nouvelleQuestion()">Nouvelle question</button>
-  <button onclick="voirSolution()">Voir la solution</button>
-  <button onclick="suivante()">Question suivante</button>
+  <button onclick="montrerReponse()">Voir la solution</button>
 
   <script>
-    const donnees = [
-      ["Je (chanter) demain.", "Je chanterai."],
-      ["Tu (jouer) dans le jardin.", "Tu joueras."],
-      ["Il (parler) à sa sœur.", "Il parlera."],
-      ["Elle (regarder) la télévision.", "Elle regardera."],
-      ["Nous (marcher) dans la rue.", "Nous marcherons."],
-      ["Vous (écouter) le maître.", "Vous écouterez."],
-      ["Ils (aimer) ce livre.", "Ils aimeront."],
-      ["Elles (danser) sur la scène.", "Elles danseront."],
-      ["Je (sauter) très haut.", "Je sauterai."],
-      ["Tu (rêver) cette nuit.", "Tu rêveras."],
-      ["Les enfants (jouer) dehors.", "Les enfants joueront."],
-      ["Mon frère (dessiner) un dragon.", "Mon frère dessinera."],
-      ["Mes parents (adorer) ce film.", "Mes parents adoreront."],
-      ["Le chat (chasser) les souris.", "Le chat chassera."],
-      ["Les filles (marcher) dans la forêt.", "Les filles marcheront."],
-      ["Papa et moi (regarder) un match.", "Papa et moi regarderons."],
-      ["Mes amis (aimer) les bonbons.", "Mes amis aimeront."],
-      ["Toi et moi (préparer) un gâteau.", "Toi et moi préparerons."],
-      ["Les élèves (écouter) attentivement.", "Les élèves écouteront."],
-      ["La maîtresse (corriger) les copies.", "La maîtresse corrigera."],
-      ["Je (ne pas sauter) dans la flaque.", "Je ne sauterai pas."],
-      ["Tu (ne pas oublier) ton cartable.", "Tu n’oublieras pas."],
-      ["Il (ne pas crier) dans la classe.", "Il ne criera pas."],
-      ["Elle (ne pas manger) de bonbons.", "Elle ne mangera pas."],
-      ["Nous (ne pas courir) dans les couloirs.", "Nous ne courrons pas."],
-      ["Vous (ne pas parler) trop fort.", "Vous ne parlerez pas."],
-      ["Ils (ne pas jouer) au ballon.", "Ils ne joueront pas."],
-      ["Elles (ne pas pleurer).", "Elles ne pleureront pas."],
-      ["On (ne pas oublier) la sortie.", "On n’oubliera pas."],
-      ["Je (ne pas bouger) d’ici.", "Je ne bougerai pas."],
-      ["Je (aider) ma maman.", "J’aiderai."],
-      ["Tu (crier) très fort.", "Tu crieras."],
-      ["Il (fermer) la porte.", "Il fermera."],
-      ["Elle (tomber) dans les bras.", "Elle tombera."],
-      ["Nous (couper) le gâteau.", "Nous couperons."],
-      ["Vous (dessiner) un paysage.", "Vous dessinerez."],
-      ["Ils (travailler) ensemble.", "Ils travailleront."],
-      ["Elles (chanter) à la fête.", "Elles chanteront."],
-      ["Je (jouer) au foot.", "Je jouerai."],
-      ["Tu (danser) avec moi.", "Tu danseras."],
-      ["Que (faire)-tu ce soir ? (jouer)", "Tu joueras."],
-      ["Demain, je (préparer) un gâteau.", "Je préparerai."],
-      ["Plus tard, tu (dessiner) une BD.", "Tu dessineras."],
-      ["À la rentrée, nous (travailler) dur.", "Nous travaillerons."],
-      ["Ce week-end, vous (visiter) un musée.", "Vous visiterez."],
-      ["Plus tard, ils (habiter) à Paris.", "Ils habiteront."],
-      ["Bientôt, elle (fermer) la fenêtre.", "Elle fermera."],
-      ["Dans 1 heure, tu (rentrer) à la maison.", "Tu rentreras."],
-      ["Quand il fera beau, on (jouer) au parc.", "On jouera."],
-      ["Dans quelques jours, vous (partager) vos dessins.", "Vous partagerez."],
-      ["Léo (travailler) chez lui.", "Léo travaillera."],
-      ["Emma et Mila (chanter) ensemble.", "Emma et Mila chanteront."],
-      ["Maxime et moi (jouer) au ballon.", "Maxime et moi jouerons."],
-      ["Toi et Tom (marcher) vite.", "Toi et Tom marcherez."],
-      ["Les garçons (rêver) d’aventure.", "Les garçons rêveront."],
-      ["La famille (visiter) un château.", "La famille visitera."],
-      ["Les enfants et les parents (préparer) la fête.", "Les enfants et les parents prépareront."],
-      ["Mon chien (écouter) bien.", "Mon chien écoutera."],
-      ["Ma sœur (aider) à la maison.", "Ma sœur aidera."],
-      ["Le facteur (donner) une lettre.", "Le facteur donnera."],
-      ["Je (trouver) la réponse.", "Je trouverai."],
-      ["Tu (arriver) à l’heure.", "Tu arriveras."],
-      ["Il (passer) par ici.", "Il passera."],
-      ["Elle (porter) une robe rouge.", "Elle portera."],
-      ["Nous (commencer) à lire.", "Nous commencerons."],
-      ["Vous (fermer) les yeux.", "Vous fermerez."],
-      ["Ils (écouter) bien.", "Ils écouteront."],
-      ["Elles (visiter) le zoo.", "Elles visiteront."],
-      ["Je (ranger) ma chambre.", "Je rangerai."],
-      ["Tu (garder) le secret.", "Tu garderas."],
-      ["Je (rêver) ce soir.", "Je rêverai."],
-      ["Tu (jouer) aux cartes.", "Tu joueras."],
-      ["Il (fermer) son cahier.", "Il fermera."],
-      ["Elle (travailler) dur.", "Elle travaillera."],
-      ["Nous (écouter) la musique.", "Nous écouterons."],
-      ["Vous (danser) au bal.", "Vous danserez."],
-      ["Ils (sauter) dans la piscine.", "Ils sauteront."],
-      ["Elles (préparer) des crêpes.", "Elles prépareront."],
-      ["Je (chercher) mes clés.", "Je chercherai."],
-      ["Tu (chanter) bien.", "Tu chanteras."],
-      ["Il (dessiner) une maison.", "Il dessinera."],
-      ["Elle (jouer) du piano.", "Elle jouera."],
-      ["Nous (porter) des manteaux.", "Nous porterons."],
-      ["Vous (préparer) la salle.", "Vous préparerez."],
-      ["Ils (chanter) ensemble.", "Ils chanteront."],
-      ["Elles (écouter) le maître.", "Elles écouteront."],
-      ["Je (marcher) avec toi.", "Je marcherai."],
-      ["Tu (regarder) la télé.", "Tu regarderas."],
-      ["Il (passer) chez moi.", "Il passera."],
-      ["Elle (fermer) la porte.", "Elle fermera."],
-      ["On (rêver) de voyage.", "On rêvera."],
-      ["Nous (danser) sur la musique.", "Nous danserons."],
-      ["Vous (ranger) vos affaires.", "Vous rangerez."],
-      ["Ils (trouver) une solution.", "Ils trouveront."],
-      ["Elles (aimer) ce dessin.", "Elles aimeront."],
-      ["Je (jouer) au ballon.", "Je jouerai."],
-      ["Tu (dessiner) une étoile.", "Tu dessineras."],
-      ["Il (préparer) un gâteau.", "Il préparera."],
-      ["Nous (écouter) la radio.", "Nous écouterons."],
-      ["Vous (regarder) les nuages.", "Vous regarderez."]
+    const questions = [
+      ["Je (marcher)", "Je marchais"],
+      ["Tu (jouer)", "Tu jouais"],
+      ["Il (aimer)", "Il aimait"],
+      ["Nous (chanter)", "Nous chantions"],
+      ["Vous (rêver)", "Vous rêviez"],
+      ["Elles (danser)", "Elles dansaient"],
+      ["Je (parler)", "Je parlais"],
+      ["Tu (manger)", "Tu mangeais"],
+      ["Il (regarder)", "Il regardait"],
+      ["Nous (travailler)", "Nous travaillions"],
+      ["Vous (écouter)", "Vous écoutiez"],
+      ["Ils (tomber)", "Ils tombaient"],
+      ["Je (fermer)", "Je fermais"],
+      ["Tu (ramasser)", "Tu ramassais"],
+      ["Elle (grimper)", "Elle grimpait"],
+      ["Nous (toucher)", "Nous touchions"],
+      ["Vous (laver)", "Vous laviez"],
+      ["Ils (voler)", "Ils volaient"],
+      ["Je (sauter)", "Je sautais"],
+      ["Tu (cuisiner)", "Tu cuisinais"]
+      // Ajoute d'autres si besoin
     ];
 
-    let index = -1;
+    let questionActuelle = null;
 
     function nouvelleQuestion() {
-      index = Math.floor(Math.random() * donnees.length);
-      document.getElementById("question").textContent = donnees[index][0];
-      document.getElementById("reponse").style.display = "none";
+      const index = Math.floor(Math.random() * questions.length);
+      questionActuelle = questions[index];
+      document.getElementById("question").textContent = questionActuelle[0];
+      document.getElementById("reponse").textContent = "";
     }
 
-    function voirSolution() {
-      if (index >= 0) {
-        document.getElementById("reponse").textContent = donnees[index][1];
-        document.getElementById("reponse").style.display = "block";
+    function montrerReponse() {
+      if (questionActuelle) {
+        document.getElementById("reponse").textContent = questionActuelle[1];
       }
-    }
-
-    function suivante() {
-      document.getElementById("question").textContent = "Clique sur \"Nouvelle question\" pour continuer.";
-      document.getElementById("reponse").style.display = "none";
     }
   </script>
 </body>
