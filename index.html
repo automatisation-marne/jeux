@@ -2,59 +2,171 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Imparfait - Verbes en -er</title>
+  <title>Coloriage magique – Smiley</title>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 20px; }
-    #question, #reponse { font-size: 24px; margin: 20px; }
-    button { font-size: 18px; margin: 10px; padding: 10px 20px; }
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    #container {
+      position: relative;
+      width: fit-content;
+      margin: 20px auto;
+    }
+    #grid {
+      display: grid;
+      grid-template-columns: repeat(10, 50px);
+      gap: 4px;
+      z-index: 1;
+    }
+    .cell {
+      width: 50px;
+      height: 50px;
+      border: 1px solid #aaa;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+    }
+    .calc {
+      font-size: 12px;
+      visibility: hidden;
+    }
+    .value {
+      font-size: 16px;
+      font-weight: bold;
+      min-height: 18px;
+    }
+    #keyboard {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #fff;
+      border: 2px solid #333;
+      padding: 10px;
+      display: none;
+      z-index: 10;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      border-radius: 10px;
+    }
+    #keyboard button {
+      width: 60px;
+      height: 40px;
+      font-size: 18px;
+      margin: 4px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-  <h1>Imparfait – Verbes du 1er groupe</h1>
-  <div id="question">Clique sur "Nouvelle question" pour commencer.</div>
-  <div id="reponse" style="color: green;"></div>
-  <button onclick="nouvelleQuestion()">Nouvelle question</button>
-  <button onclick="montrerReponse()">Voir la solution</button>
 
-  <script>
-    const questions = [
-  ["Je (dessiner)", "Je dessinais"],
-  ["Tu (ranger)", "Tu rangeais"],
-  ["Il (traverser)", "Il traversait"],
-  ["Nous (porter)", "Nous portions"],
-  ["Vous (terminer)", "Vous terminiez"],
-  ["Elles (habiter)", "Elles habitaient"],
-  ["Je (jouer)", "Je jouais"],
-  ["Tu (aider)", "Tu aidais"],
-  ["Il (pleurer)", "Il pleurait"],
-  ["Nous (arriver)", "Nous arrivions"],
-  ["Vous (crier)", "Vous criiez"],
-  ["Ils (regarder)", "Ils regardaient"],
-  ["Je (adorer)", "Je adorais"],
-  ["Tu (passer)", "Tu passais"],
-  ["Elle (apporter)", "Elle apportait"],
-  ["Nous (gratter)", "Nous grattions"],
-  ["Vous (marcher)", "Vous marchiez"],
-  ["Ils (glisser)", "Ils glissaient"],
-  ["Je (jouer)", "Je jouais"],
-  ["Tu (penser)", "Tu pensais"]
-];
+<h1>Coloriage magique – Smiley</h1>
+<div id="container">
+  <div id="grid"></div>
+  <div id="keyboard"></div>
+</div>
 
+<script>
+  const pattern = [
+    "WWJJJJJJWW",
+    "WJJJJJJJJW",
+    "JJBWJJWBJJ",
+    "JJBWJJWBJJ",
+    "JJJJJJJJJJ",
+    "JJWWWWWWJJ",
+    "JJJWWWWJJJ",
+    "WJJBBBBJJW",
+    "WWJJJJJJWW",
+    "WWWJJJJWWWW"
+  ];
 
-    let questionActuelle = null;
+  const colors = { "J": "yellow", "B": "black", "W": "white" };
+  const grid = document.getElementById("grid");
+  const keyboard = document.getElementById("keyboard");
 
-    function nouvelleQuestion() {
-      const index = Math.floor(Math.random() * questions.length);
-      questionActuelle = questions[index];
-      document.getElementById("question").textContent = questionActuelle[0];
-      document.getElementById("reponse").textContent = "";
-    }
+  let activeCell = null;
+  let activeValueDiv = null;
+  let activeCalcDiv = null;
+  let activeAnswer = "";
+  let expectedResult = null;
+  let expectedColor = null;
 
-    function montrerReponse() {
-      if (questionActuelle) {
-        document.getElementById("reponse").textContent = questionActuelle[1];
-      }
-    }
-  </script>
+  function getRandomMultiplication() {
+    const a = Math.floor(Math.random() * 5) + 1;
+    const b = Math.floor(Math.random() * 10) + 1;
+    return { a, b, result: a * b };
+  }
+
+  function createKeyboard() {
+    const keys = ["1","2","3","4","5","6","7","8","9","0","Effacer","Valider"];
+    keys.forEach(k => {
+      const btn = document.createElement("button");
+      btn.textContent = k;
+      btn.onclick = () => {
+        if (!activeCell) return;
+        if (k === "Effacer") {
+          activeAnswer = "";
+        } else if (k === "Valider") {
+          if (parseInt(activeAnswer) === expectedResult) {
+            activeCell.style.backgroundColor = expectedColor;
+          } else {
+            activeCell.style.backgroundColor = "white";
+          }
+          keyboard.style.display = "none";
+          return;
+        } else {
+          activeAnswer += k;
+        }
+        activeValueDiv.textContent = activeAnswer;
+      };
+      keyboard.appendChild(btn);
+    });
+  }
+
+  // Construction de la grille
+  pattern.forEach(row => {
+    [...row].forEach(letter => {
+      const { a, b, result } = getRandomMultiplication();
+      const color = colors[letter];
+
+      const cell = document.createElement("div");
+      cell.className = "cell";
+
+      const calc = document.createElement("div");
+      calc.className = "calc";
+      calc.textContent = `${a}×${b}`;
+
+      const value = document.createElement("div");
+      value.className = "value";
+
+      cell.appendChild(calc);
+      cell.appendChild(value);
+      grid.appendChild(cell);
+
+      cell.addEventListener("click", () => {
+        document.querySelectorAll(".calc").forEach(e => e.style.visibility = "hidden");
+        calc.style.visibility = "visible";
+
+        activeCell = cell;
+        activeValueDiv = value;
+        activeCalcDiv = calc;
+        activeAnswer = "";
+        expectedResult = result;
+        expectedColor = color;
+        value.textContent = "";
+        keyboard.style.display = "flex";
+      });
+    });
+  });
+
+  createKeyboard();
+</script>
+
 </body>
 </html>
