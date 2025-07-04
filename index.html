@@ -5,19 +5,19 @@
   <title>Système Suisse - Appariements</title>
   <style>
     body { font-family: sans-serif; padding: 20px; }
-    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; }
-    input[type=number] { width: 60px; }
+    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 5px; text-align: center; }
+    button { font-size: 20px; padding: 5px 10px; }
+    .score-controls { display: flex; justify-content: center; gap: 5px; }
   </style>
 </head>
 <body>
 
-<h1>Appariements Système Suisse</h1>
+<h1>Tournoi Système Suisse</h1>
 
-<h2>Joueurs et points (modifiable)</h2>
+<h2>Joueurs et points</h2>
 <table id="joueursTable">
-  <tr><th>Nom</th><th>Points</th></tr>
+  <tr><th>Nom</th><th>Points</th><th>Modifier</th></tr>
 </table>
-<button onclick="mettreAJourPoints()">Mettre à jour points</button>
 
 <h2>Appariements proposés</h2>
 <div id="appariements"></div>
@@ -25,53 +25,48 @@
 
 <script>
 let joueurs = [
-  { nom: "Cyrine", pts: 1 },
-  { nom: "Amina", pts: 1 },
-  { nom: "Mohamed", pts: 1 },
-  { nom: "Hamza M", pts: 1 },
-  { nom: "Badr", pts: 1 },
-  { nom: "Ritéj", pts: 1 },
-  { nom: "Redina", pts: 1 },
-  { nom: "Savana", pts: 1 },
-  { nom: "Gaël K", pts: 0.5 },
-  { nom: "Soulayman B", pts: 0.5 },
-  { nom: "Amira", pts: 0.5 },
-  { nom: "Soulayman", pts: 0 },
-  { nom: "Hamza", pts: 0 },
-  { nom: "Inaya", pts: 0 },
-  { nom: "Marieme", pts: 0 },
-  { nom: "Joud", pts: 0 },
-  { nom: "Nesrine", pts: 0 },
-  { nom: "Lili", pts: 0 },
-  { nom: "Candice", pts: 0 },
-  { nom: "Iamza", pts: 0 }
+  { nom: "Marieme", pts: 0, dernierBlanc: false },
+  { nom: "Soulaymen", pts: 0, dernierBlanc: false },
+  { nom: "Inaya", pts: 0, dernierBlanc: false },
+  { nom: "Redina", pts: 0, dernierBlanc: false },
+  { nom: "Lilli", pts: 0, dernierBlanc: false },
+  { nom: "Sama", pts: 0, dernierBlanc: false },
+  { nom: "Sarah", pts: 0, dernierBlanc: false },
+  { nom: "Hamza Mimoun", pts: 0, dernierBlanc: false },
+  { nom: "Cyrine", pts: 0, dernierBlanc: false },
+  { nom: "Iamza", pts: 0, dernierBlanc: false },
+  { nom: "Badr", pts: 0, dernierBlanc: false },
+  { nom: "Hamza Ybri", pts: 0, dernierBlanc: false },
+  { nom: "Mehdi", pts: 0, dernierBlanc: false },
+  { nom: "Joud", pts: 0, dernierBlanc: false },
+  { nom: "Amina", pts: 0, dernierBlanc: false },
+  { nom: "Amira", pts: 0, dernierBlanc: false },
+  { nom: "Ritej", pts: 0, dernierBlanc: false },
+  { nom: "Mohammed", pts: 0, dernierBlanc: false }
 ];
 
 let rencontres = {};
-for (let j of joueurs) {
-  rencontres[j.nom] = new Set();
-}
+joueurs.forEach(j => rencontres[j.nom] = new Set());
 
 function afficherJoueurs() {
   let table = document.getElementById("joueursTable");
-  table.innerHTML = "<tr><th>Nom</th><th>Points</th></tr>";
-  for (let j of joueurs) {
+  table.innerHTML = "<tr><th>Nom</th><th>Points</th><th>Modifier</th></tr>";
+  joueurs.forEach(j => {
     table.innerHTML += `<tr>
       <td>${j.nom}</td>
-      <td><input type="number" step="0.5" value="${j.pts}" data-nom="${j.nom}"></td>
+      <td id="score-${j.nom}">${j.pts}</td>
+      <td class="score-controls">
+        <button onclick="modifierScore('${j.nom}', 0.5)">+</button>
+        <button onclick="modifierScore('${j.nom}', -0.5)">-</button>
+      </td>
     </tr>`;
-  }
+  });
 }
 
-function mettreAJourPoints() {
-  let inputs = document.querySelectorAll("#joueursTable input");
-  inputs.forEach(input => {
-    let nom = input.dataset.nom;
-    let val = parseFloat(input.value);
-    let joueur = joueurs.find(j => j.nom === nom);
-    if (!isNaN(val)) joueur.pts = val;
-  });
-  alert("Points mis à jour !");
+function modifierScore(nom, delta) {
+  let joueur = joueurs.find(j => j.nom === nom);
+  joueur.pts = Math.max(0, joueur.pts + delta);
+  document.getElementById(`score-${nom}`).innerText = joueur.pts;
 }
 
 function genererAppariements() {
@@ -80,13 +75,32 @@ function genererAppariements() {
 
   while (dispo.length > 1) {
     let j1 = dispo.shift();
+
+    // Chercher un adversaire avec points proches, jamais rencontré si possible
     let index = dispo.findIndex(j2 => !rencontres[j1.nom].has(j2.nom));
     if (index === -1) index = 0;
     let j2 = dispo.splice(index,1)[0];
 
-    appariements.push(`${j1.nom} (${j1.pts}) vs ${j2.nom} (${j2.pts})`);
+    // Déterminer les couleurs pour alterner
+    let j1Blanc = !j1.dernierBlanc;
+    let j2Blanc = !j2.dernierBlanc;
+    let blanc, noir;
+
+    if (j1Blanc !== j2Blanc) {
+      blanc = j1Blanc ? j1 : j2;
+      noir = blanc === j1 ? j2 : j1;
+    } else {
+      blanc = j1;
+      noir = j2;
+    }
+
+    blanc.dernierBlanc = true;
+    noir.dernierBlanc = false;
+
     rencontres[j1.nom].add(j2.nom);
     rencontres[j2.nom].add(j1.nom);
+
+    appariements.push(`${blanc.nom} (${blanc.pts}) ♔ vs ♚ ${noir.nom} (${noir.pts})`);
   }
 
   if (dispo.length === 1) {
